@@ -106,6 +106,7 @@ class _ImportScreenState extends State<ImportScreen> {
     }
 
     _textController.text = text;
+    if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('تم لصق البيانات بنجاح')),
     );
@@ -455,7 +456,7 @@ class _ImportScreenState extends State<ImportScreen> {
         shrinkWrap: true,
         padding: const EdgeInsets.symmetric(vertical: 6),
         itemCount: preview.rows.length,
-        separatorBuilder: (_, __) => const Divider(height: 1),
+        separatorBuilder: (_, _) => const Divider(height: 1),
         itemBuilder: (context, index) {
           final row = preview.rows[index];
           return ListTile(

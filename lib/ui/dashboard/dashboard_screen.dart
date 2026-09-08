@@ -153,6 +153,17 @@ class DashboardScreenState extends State<DashboardScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
               if (!isCommissionOnly)
                 IconButton(
                   visualDensity: VisualDensity.compact,
@@ -440,6 +451,7 @@ class DashboardScreenState extends State<DashboardScreen> {
     if (settings == null || summary == null || period == null) return;
 
     final override = await _db.getSalaryOverride(period.monthName, period.year);
+    if (!mounted) return;
     final hasOverride = override != null;
     final controller = TextEditingController(
       text: _numText(summary.actualSalary),

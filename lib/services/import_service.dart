@@ -1,5 +1,3 @@
-import 'package:sqflite/sqflite.dart';
-
 import '../core/date_utils.dart';
 import '../core/formatters.dart';
 import '../data/app_database.dart';
@@ -225,7 +223,7 @@ class ImportService {
           lineNumber: lineNum,
           rawColumns: cols,
           isValid: true,
-          data: Client(name: name, phone: phone),
+          data: Client(name: name, phone: phone ?? ''),
           extraInfo: phone != null ? 'هاتف: $phone$duplicateTag' : 'بدون رقم هاتف$duplicateTag',
         ),
       );

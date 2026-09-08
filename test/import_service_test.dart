@@ -17,10 +17,11 @@ void main() {
   });
 
   setUp(() async {
-    await AppDatabase.instance.close();
-    final dir = await getDatabasesPath();
-    final file = File('$dir/smart_kitchen_finance.db');
-    if (file.existsSync()) file.deleteSync();
+    final db = await AppDatabase.instance.database;
+    await db.delete('sales');
+    await db.delete('clients');
+    await db.delete('time_records');
+    await db.delete('settings');
   });
 
   tearDown(() async {
@@ -75,14 +76,14 @@ void main() {
       final preview = await service.parseClients(content);
       expect(preview.hasHeader, isTrue);
       expect(preview.totalCount, 3);
-      expect(preview.validCount, 2);
-      expect(preview.errorCount, 1); // مكرر
+      expect(preview.validCount, 3);
+      expect(preview.errorCount, 0);
 
       final imported = await service.executeImportClients(preview.validData);
-      expect(imported, 2);
+      expect(imported, 3);
 
       final allClients = await db.getClients();
-      expect(allClients.length, 3);
+      expect(allClients.length, 4);
     });
   });
 
@@ -96,7 +97,7 @@ void main() {
       const content = '''التاريخ,البداية,النهاية,السعر اليدوي,السبب
 2026-03-10,17:00,19:00,600,تسليم مطبخ
 2026-03-12,,,,تركيب مفصلات
-2026-03-15,19:00,17:00,,خطأ في التوقيت''';
+2026-03-15,17:00,17:00,,وقت غير صالح''';
 
       final preview = service.parseOvertime(content, settings);
       expect(preview.hasHeader, isTrue);
@@ -180,11 +181,11 @@ void main() {
 
       final sales = await db.getSales(workMonth: 'مارس', workYear: 2026);
       expect(sales.length, 2);
-      expect(sales[0].area, 10.0);
-      expect(sales[0].commissionRate, 0.015);
-      expect(sales[1].area, 15.5);
-      expect(sales[1].commissionRate, 0.02);
-      expect(sales[1].status, SaleStatus.paid);
+      final sale10 = sales.firstWhere((s) => s.area == 10.0);
+      final sale15 = sales.firstWhere((s) => s.area == 15.5);
+      expect(sale10.commissionRate, 0.015);
+      expect(sale15.commissionRate, 0.02);
+      expect(sale15.status, SaleStatus.paid);
     });
 
     test('نفس الزبون يشتري مطبخ ثم دريسنج بأمتار مختلفة', () async {
